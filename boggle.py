@@ -19,34 +19,35 @@ args = parser.parse_args()
 board = args.board[0]
 
 
+def create_dictionary(dictionary='/usr/share/dict/words'):
 """
 Imports words from a local dictionary into a python dictionary
 """
-def create_dictionary(dictionary='/usr/share/dict/words'):
-	with open(dictionary, 'r') as f:
-		return {line.strip() for line in f.readlines()}
+    with open(dictionary, 'r') as f:
+        return {line.strip() for line in f.readlines()}
 
+
+def permutation(board, length):
 """
 Returns all permutations of length i of the letters
 """
-def permutation(board, length):
-	return set(itertools.permutations(board, length))
-	 
+    return set(itertools.permutations(board, length))
+     
+def boggle(board):
 """
 Prints all permutations that are availbale in the dictionary
 """
-def boggle(board):
-	words = create_dictionary()
-	
-	# Iterates through all possible lengths (words of length 2 - length of board)
-	for i in xrange(2, len(board)+1):
-		permutations = permutation(board, i)
-		perm = []
-		for p in permutations:	
-			perm.append(''.join(elem[0] for elem in p)) # Joins letters into one string
-		for item in (perm):
-			if item.lower() in words:
-				print item.lower()
+    words = create_dictionary()
+    
+    # Iterates through all possible lengths (words of length 2 - length of board)
+    for i in xrange(2, len(board)+1):
+        permutations = permutation(board, i)
+        perm = []
+        for p in permutations:  
+            perm.append(''.join(elem[0] for elem in p)) # Joins letters into one string
+        for item in (perm):
+            if item.lower() in words:
+                print item.lower()
 
 boggle(board)
 
