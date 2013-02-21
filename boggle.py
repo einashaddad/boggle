@@ -7,7 +7,7 @@ returns the different different words that can be created
 using those letters
 """
 
-import itertools
+#import itertools
 import argparse
 
 """
@@ -20,23 +20,45 @@ board = args.board[0]
 
 
 def create_dictionary(dictionary='/usr/share/dict/words'):
-"""
-Imports words from a local dictionary into a python dictionary
-"""
+    """
+    Imports words from a local dictionary into a python dictionary
+    """
     with open(dictionary, 'r') as f:
         return {line.strip() for line in f.readlines()}
+ 
+def power_set(permutations, n):
+    """
+    Returns the set of permutations of length n from the power set of the elements
+    """
+    results = []
 
+    for perm in permutations:
+        results.append(perm[:n])
+    return set(results)
 
-def permutation(board, length):
-"""
-Returns all permutations of length i of the letters
-"""
-    return set(itertools.permutations(board, length))
-     
+def permutation(elements, length):
+    """
+    Returns all permutations of the given elements
+    """
+
+#     return set(itertools.permutations(board, length))
+
+    result = []
+
+    #base case
+    if len(elements) <= 1:
+        return elements
+
+    #recursive case
+    for i, element in enumerate(elements):
+        for perm in permutation(elements[:i]+elements[i+1:], length):
+            result.append(element + perm)
+    return power_set(result, length)
+
 def boggle(board):
-"""
-Prints all permutations that are availbale in the dictionary
-"""
+    """
+    Prints all permutations that are availbale in the dictionary
+    """
     words = create_dictionary()
     
     # Iterates through all possible lengths (words of length 2 - length of board)
