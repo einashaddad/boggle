@@ -7,16 +7,19 @@ returns the different different words that can be created
 using those letters
 """
 
-#import itertools
+import itertools
 import argparse
+import boggle_graph
 
 """
 Parses the arguments from the command line and calls the function boggle
 """
 parser = argparse.ArgumentParser()
-parser.add_argument("board", nargs = 1, help="a string of letters e.g. small")
+parser.add_argument("board", nargs = 1, help="a string of characters (nxn board)")
+parser.add_argument("n", nargs = 1, help="n where n is the width or height of the board")
 args = parser.parse_args()
 board = args.board[0]
+n = int(args.n[0])
 
 
 def create_dictionary(dictionary='/usr/share/dict/words'):
@@ -41,7 +44,7 @@ def permutation(elements, length):
     Returns all permutations of the given elements
     """
 
-#     return set(itertools.permutations(board, length))
+    # return set(itertools.permutations(board, length))
 
     result = []
 
@@ -59,17 +62,54 @@ def boggle(board):
     """
     Prints all permutations that are availbale in the dictionary
     """
+    result = []
     words = create_dictionary()
     
-    # Iterates through all possible lengths (words of length 2 - length of board)
-    for i in xrange(2, len(board)+1):
+    # Iterates through all possible lengths (words of length 3 - length of board)
+    for i in xrange(3, len(board)+1):
         permutations = permutation(board, i)
         perm = []
         for p in permutations:  
             perm.append(''.join(elem[0] for elem in p)) # Joins letters into one string
         for item in (perm):
             if item.lower() in words:
-                print item.lower()
+                result.append(item.lower())
+    return result
 
-boggle(board)
+def check_perm(graph, current_letter, next_letter=None):
+    """
+    Returns True if the next letter in the permutation is reachable by the current letter
+    """
+    if current_letter in graph and next_letter in graph[current_letter]:
+        return True
+    return False
+
+def return_words(permutations, graph):
+    """
+    Returns all permutations that are available on the boggle board
+    """
+    result = []
+    word = ''
+    for permutation in permutations:    
+        for i, letter in enumerate(permutation):   
+            if i < len(permutation)-1:
+                if not check_perm(graph, letter, permutation[i+1]): 
+                    word = ''
+                    break
+                word = word + permutation[i]
+            else:   # if letter is the last letter in the word
+                word = word + permutation[i]
+        if word:
+            result.append(word)
+            word = ''
+    return (result) 
+
+permutations = boggle(board)  
+board, position = boggle_graph.make_board(board, n)
+graph = boggle_graph.make_graph(board, position)
+print return_words(permutations, graph)
+
+
+
+
 
