@@ -21,6 +21,7 @@ args = parser.parse_args()
 board = args.board[0]
 n = int(args.n[0])
 
+visited = {}
 
 def create_dictionary(dictionary='/usr/share/dict/words'):
     """
@@ -76,38 +77,34 @@ def boggle(board):
                 result.append(item.lower())
     return result
 
-def check_perm(graph, current_letter, next_letter=None):
+def dfs(graph, word, node=' '):
     """
-    Returns True if the next letter in the permutation is reachable by the current letter
+    Performs depth-first-search on the graph, returns True if the word is present
     """
-    if current_letter in graph and next_letter in graph[current_letter]:
+    global visited
+    # base case
+    if word[0] in node and len(word) <= 1:
         return True
+    if word[0] not in node:
+        return False
+    # recursive step
+    visited[(node)] = True 
+    for neighbor in graph[node]:
+        if not visited.get((neighbor), False):
+            if dfs(graph, word[1:], neighbor):
+                return True
+    visited[(node)] = False
     return False
-
-def return_words(permutations, graph):
-    """
-    Returns all permutations that are available on the boggle board
-    """
-    result = []
-    word = ''
-    for permutation in permutations:    
-        for i, letter in enumerate(permutation):   
-            if i < len(permutation)-1:
-                if not check_perm(graph, letter, permutation[i+1]): 
-                    word = ''
-                    break
-                word = word + permutation[i]
-            else:   # if letter is the last letter in the word
-                word = word + permutation[i]
-        if word:
-            result.append(word)
-            word = ''
-    return (result) 
 
 permutations = boggle(board)  
 board, position = boggle_graph.make_board(board, n)
 graph = boggle_graph.make_graph(board, position)
-print return_words(permutations, graph)
+for word in permutations: 
+    visited = {}
+    if dfs(graph, ' '+word):
+        print word
+
+
 
 
 

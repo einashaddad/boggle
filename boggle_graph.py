@@ -28,11 +28,13 @@ def get_neighbors(node, board, position):
 	"""
 	result = []
 	x, y = position[0], position[1]
-	neighbors = [board[x-1][y-1], board[x-1][y], board[x-1][y+1], \
-					board[x][y-1], board[x][y+1], \
-						board[x+1][y-1], board[x+1][y], board[x+1][y+1]]
+	a, b = x-1, y-1
+	neighbors = [(board[x-1][y-1], (a-1,b-1)), (board[x-1][y], (a-1,b)), \
+				(board[x-1][y+1], (a-1, b+1)), (board[x][y-1], (a, b-1)), \
+				(board[x][y+1], (a,b+1)), (board[x+1][y-1], (a+1, b-1)), \
+				(board[x+1][y], (a+1, b)), (board[x+1][y+1], (a+1, b+1))]
 	for neighbor in neighbors:
-		if neighbor:
+		if neighbor[0]:
 			result.append(neighbor)
 	return result
 
@@ -42,14 +44,9 @@ def make_graph(board, position):
 	as the values
 	"""
 	graph = {}
+	graph[' '] = []
 	for node in position:
-		graph[position[node]] = get_neighbors(position[node], board, (node[0]+1, node[1]+1))
+		graph[(position[node], node)] = get_neighbors(position[node], board, (node[0]+1, node[1]+1))
+		graph[' '].append((position[node], node))
 	return graph	
-
-if __name__ == '__main__':
-
-	B = "BAT JOK ERP"
-    
-	board, position = make_board(B, 3)
-	print make_graph(board, position)
 
